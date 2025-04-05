@@ -2,7 +2,6 @@
 
 # Object representing a `HashMap`
 class HashMap
-  attr_accessor :buckets
   def initialize
     @load_factor = 0.8
     @capacity = 16

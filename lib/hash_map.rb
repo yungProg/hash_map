@@ -29,4 +29,11 @@ class HashMap
     @buckets[bucket] << [key, value] 
 
   end
+
+  def get(key)
+    bucket = hash(key) % @capacity
+    @buckets[bucket].each {|pair| return pair[1] if key == pair[0]}
+
+    nil
+  end
 end

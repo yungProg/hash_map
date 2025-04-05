@@ -41,4 +41,16 @@ class HashMap
     bucket = hash(key) % @capacity
     @buckets[bucket].any? {|pair| key == pair[0]}
   end
+
+  def remove(key)
+    bucket = hash(key) % @capacity
+    deleted_pair = nil
+    @buckets[bucket].each do |pair|
+      if key == pair[0]
+        deleted_pair = @buckets[bucket].delete(pair)
+        break
+      end
+    end
+    deleted_pair
+  end
 end

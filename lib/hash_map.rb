@@ -36,4 +36,9 @@ class HashMap
 
     nil
   end
+
+  def has?(key)
+    bucket = hash(key) % @capacity
+    @buckets[bucket].any? {|pair| key == pair[0]}
+  end
 end

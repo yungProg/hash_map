@@ -60,4 +60,10 @@ class HashMap
     buckets_dup.each {counter += 1}
     counter / 2
   end
+
+  def clear
+    @load_factor = 0.8
+    @capacity = 16
+    @buckets = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+  end
 end

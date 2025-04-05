@@ -53,4 +53,11 @@ class HashMap
     end
     deleted_pair
   end
+
+  def length
+    buckets_dup = @buckets.dup.flatten
+    counter = 0
+    buckets_dup.each {counter += 1}
+    counter / 2
+  end
 end

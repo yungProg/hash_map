@@ -4,6 +4,7 @@ class HashMap
   def initialize
     @load_factor = 0.8
     @capacity = 16
+    @buckets = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
   end
 
   def hash(key)
@@ -14,4 +15,15 @@ class HashMap
 
     hash_code
   end
+
+  def ss
+    puts @buckets.length
+  end
+
+  def set(key, value)
+    hash_code = hash(key) % 16
+    
+  end
 end
+
+p Hash.new

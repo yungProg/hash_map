@@ -22,24 +22,23 @@ class HashMap
     bucket = hash(key) % @capacity
     return @buckets[bucket] << [key, value] if @buckets[bucket].empty?
 
-    @buckets[bucket].each_with_index do |pair, index|
+    @buckets[bucket].each do |pair|
       return pair[1] = value if key == pair[0]
     end
-    
-    @buckets[bucket] << [key, value] 
 
+    @buckets[bucket] << [key, value]
   end
 
   def get(key)
     bucket = hash(key) % @capacity
-    @buckets[bucket].each {|pair| return pair[1] if key == pair[0]}
+    @buckets[bucket].each { |pair| return pair[1] if key == pair[0] }
 
     nil
   end
 
   def has?(key)
     bucket = hash(key) % @capacity
-    @buckets[bucket].any? {|pair| key == pair[0]}
+    @buckets[bucket].any? { |pair| key == pair[0] }
   end
 
   def remove(key)
@@ -57,7 +56,7 @@ class HashMap
   def length
     buckets_dup = @buckets.dup.flatten
     counter = 0
-    buckets_dup.each {counter += 1}
+    buckets_dup.each { counter += 1 }
     counter / 2
   end
 

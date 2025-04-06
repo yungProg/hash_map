@@ -65,4 +65,15 @@ class HashMap
     @capacity = 16
     @buckets = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
   end
+
+  def keys
+    buckets_dup = @buckets.dup.flatten
+    counter = 0
+    all_keys = []
+    while buckets_dup.length > counter
+      all_keys << buckets_dup[counter]
+      counter += 2
+    end
+    all_keys
+  end
 end

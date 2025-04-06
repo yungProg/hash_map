@@ -87,4 +87,15 @@ class HashMap
     end
     all_values
   end
+
+  def entries
+    buckets_dup = @buckets.dup.flatten
+    all_entries = []
+    counter = 0
+    while buckets_dup.length > counter
+      all_entries << [buckets_dup[counter], buckets_dup[counter + 1]]
+      counter += 2
+    end
+    all_entries
+  end
 end

@@ -2,6 +2,8 @@
 
 # Object representing a `HashMap`
 class HashMap
+  attr_accessor :buckets
+
   def initialize
     @load_factor = 0.8
     @capacity = 16
@@ -75,5 +77,16 @@ class HashMap
       counter += 2
     end
     all_keys
+  end
+
+  def values
+    buckets_dup = @buckets.dup.flatten
+    counter = 1
+    all_values = []
+    while buckets_dup.length > counter
+      all_values << buckets_dup[counter]
+      counter += 2
+    end
+    all_values
   end
 end

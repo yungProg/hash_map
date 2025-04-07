@@ -18,8 +18,17 @@ class HashMap
     hash_code
   end
 
+  def self.grow
+    buckets_dup = @buckets.dup
+    @buckets = Array.new(@capacity + 16) {Array.new}
+    buckets_dup.each do |pair|
+      self.set(pair[0], pair[1]) unless self.empty?
+    end
+  end
+
   def set(key, value)
     bucket = hash(key) % @capacity
+    self.grow if self.length > @threshold
     return @buckets[bucket] << [key, value] if @buckets[bucket].empty?
 
     @buckets[bucket].each do |pair|

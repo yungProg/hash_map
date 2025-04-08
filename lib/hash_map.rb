@@ -35,7 +35,7 @@ class HashMap
   end
 
   def shrink
-    return if length <= 16
+    return if @capacity <= 16
     active_buckets = entries
     @capacity /= 2
     @threshold = @capacity * @load_factor

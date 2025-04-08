@@ -22,6 +22,7 @@ class HashMap
   def bucket_index(key)
     index = hash(key)
     raise IndexError if index.negative? || index >= @buckets.length
+
     index
   end
 
@@ -36,11 +37,12 @@ class HashMap
 
   def shrink
     return if @capacity <= 16
+
     active_buckets = entries
     @capacity /= 2
     @threshold = @capacity * @load_factor
     @size = 0
-    @buckets = Array.new(@capacity) {Array.new}
+    @buckets = Array.new(@capacity) { [] }
     active_buckets.each { |key, value| set(key, value) }
   end
 
@@ -73,11 +75,11 @@ class HashMap
     bucket = bucket_index(key)
     deleted_pair = nil
     @buckets[bucket].each do |pair|
-      if pair[0] == key
-        deleted_pair = @buckets[bucket].delete(pair)
-        @size -= 1
-        break
-      end
+      next unless pair[0] == key
+
+      deleted_pair = @buckets[bucket].delete(pair)
+      @size -= 1
+      break
     end
     shrink if @size < (@capacity * 0.25) && @capacity > 16
     deleted_pair
@@ -103,7 +105,7 @@ class HashMap
   end
 
   def entries
-    @buckets.flat_map { |bucket| bucket.map(&:itself)}
+    @buckets.flat_map { |bucket| bucket.map(&:itself) }
   end
 
   private :grow, :shrink, :bucket_index

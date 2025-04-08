@@ -13,7 +13,7 @@ class HashSet
   def hash(key)
     hash_code = 0
     prime_number = 31
-    key.each_char { |char| hash_code = (prime_number * hash_code) + char.ord}
+    key.each_char { |char| hash_code = (prime_number * hash_code) + char.ord }
 
     hash_code % @capacity
   end
@@ -21,6 +21,7 @@ class HashSet
   def bucket_index(key)
     index = hash(key)
     raise IndexError if index.negative? || index >= @buckets.length
+
     index
   end
 
@@ -30,11 +31,12 @@ class HashSet
     @capacity *= 2
     @threshold = @load_factor * @capacity
     @buckets = Array.new(@capacity) { [] }
-    active_buckets.each { |item| set(item)}
+    active_buckets.each { |item| set(item) }
   end
 
   def shrink
     return if @capacity <= 16
+
     active_buckets = keys
     @size = 0
     @capacity /= 2
@@ -46,7 +48,7 @@ class HashSet
   def set(key)
     bucket = bucket_index(key)
     @buckets[bucket].each do |item|
-      return if item == key
+      return nil if item == key
     end
     @buckets[bucket] << key
     @size += 1

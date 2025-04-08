@@ -2,8 +2,9 @@
 
 # Object representing a `HashMap`
 class HashMap
+  attr_accessor :buckets, :threshold
   def initialize
-    @load_factor = 0.8
+    @load_factor = 0.75
     @capacity = 16
     @threshold = @load_factor * @capacity
     @buckets = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
@@ -18,17 +19,24 @@ class HashMap
     hash_code
   end
 
-  def self.grow
-    buckets_dup = @buckets.dup
-    @buckets = Array.new(@capacity + 16) {Array.new}
-    buckets_dup.each do |pair|
-      self.set(pair[0], pair[1]) unless self.empty?
-    end
+  def grow
+    active_buckets = self.entries
+    @capacity += 16
+    @buckets = Array.new(@capacity) {Array.new}
+    active_buckets.each { |pair| self.set(pair[0], pair[1]) }
+  end
+
+  def shrink
+    active_buckets = self.entries
+    @capacity -= (16 * (@threshold - 12) / 12)
+    @buckets = Array.new(@capacity) {Array.new}
+    active_buckets.each { |pair| self.set(pair[0], pair[1]) }
   end
 
   def set(key, value)
+    self.grow if self.length >= @threshold
     bucket = hash(key) % @capacity
-    self.grow if self.length > @threshold
+    puts bucket
     return @buckets[bucket] << [key, value] if @buckets[bucket].empty?
 
     @buckets[bucket].each do |pair|
@@ -59,6 +67,7 @@ class HashMap
         break
       end
     end
+    shrink if self.length < (@threshold - 12)
     deleted_pair
   end
 

@@ -2,12 +2,12 @@
 
 # Object representing a `HashMap`
 class HashMap
-  attr_accessor :buckets, :threshold
   def initialize
     @load_factor = 0.75
     @capacity = 16
     @threshold = @load_factor * @capacity
-    @buckets = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+    @buckets = Array.new(@capacity) { [] }
+    @size = 0
   end
 
   def hash(key)
@@ -16,104 +16,95 @@ class HashMap
 
     key.each_char { |char| hash_code = (prime_number * hash_code) + char.ord }
 
-    hash_code
+    hash_code % @capacity
+  end
+
+  def bucket_index(key)
+    index = hash(key)
+    raise IndexError if index.negative? || index >= @buckets.length
+    index
   end
 
   def grow
-    active_buckets = self.entries
-    @capacity += 16
-    @buckets = Array.new(@capacity) {Array.new}
-    active_buckets.each { |pair| self.set(pair[0], pair[1]) }
+    active_buckets = entries
+    @capacity *= 2
+    @threshold = @capacity * @load_factor
+    @size = 0
+    @buckets = Array.new(@capacity) { [] }
+    active_buckets.each { |key, value| set(key, value) }
   end
 
   def shrink
-    active_buckets = self.entries
-    @capacity -= (16 * (@threshold - 12) / 12)
+    return if length <= 16
+    active_buckets = entries
+    @capacity /= 2
+    @threshold = @capacity * @load_factor
+    @size = 0
     @buckets = Array.new(@capacity) {Array.new}
-    active_buckets.each { |pair| self.set(pair[0], pair[1]) }
+    active_buckets.each { |key, value| set(key, value) }
   end
 
   def set(key, value)
-    self.grow if self.length >= @threshold
-    bucket = hash(key) % @capacity
-    puts bucket
-    return @buckets[bucket] << [key, value] if @buckets[bucket].empty?
-
+    grow if length >= @threshold
+    bucket = bucket_index(key)
     @buckets[bucket].each do |pair|
-      return pair[1] = value if key == pair[0]
+      if key == pair[0]
+        pair[1] = value
+        return
+      end
     end
-
     @buckets[bucket] << [key, value]
+    @size += 1
   end
 
   def get(key)
-    bucket = hash(key) % @capacity
+    bucket = bucket_index(key)
     @buckets[bucket].each { |pair| return pair[1] if key == pair[0] }
 
     nil
   end
 
   def has?(key)
-    bucket = hash(key) % @capacity
+    bucket = bucket_index(key)
     @buckets[bucket].any? { |pair| key == pair[0] }
   end
 
   def remove(key)
-    bucket = hash(key) % @capacity
+    bucket = bucket_index(key)
     deleted_pair = nil
     @buckets[bucket].each do |pair|
-      if key == pair[0]
+      if pair[0] == key
         deleted_pair = @buckets[bucket].delete(pair)
+        @size -= 1
         break
       end
     end
-    shrink if self.length < (@threshold - 12)
+    shrink if @size < (@capacity * 0.25) && @capacity > 16
     deleted_pair
   end
 
   def length
-    buckets_dup = @buckets.dup.flatten
-    counter = 0
-    buckets_dup.each { counter += 1 }
-    counter / 2
+    @size
   end
 
   def clear
-    @load_factor = 0.8
     @capacity = 16
-    @buckets = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+    @threshold = @capacity * @load_factor
+    @buckets = Array.new(@capacity) { [] }
+    @size = 0
   end
 
   def keys
-    buckets_dup = @buckets.dup.flatten
-    counter = 0
-    all_keys = []
-    while buckets_dup.length > counter
-      all_keys << buckets_dup[counter]
-      counter += 2
-    end
-    all_keys
+    @buckets.flat_map { |bucket| bucket.map(&:first) }
   end
 
   def values
-    buckets_dup = @buckets.dup.flatten
-    counter = 1
-    all_values = []
-    while buckets_dup.length > counter
-      all_values << buckets_dup[counter]
-      counter += 2
-    end
-    all_values
+    @buckets.flat_map { |bucket| bucket.map(&:last) }
   end
 
   def entries
-    buckets_dup = @buckets.dup.flatten
-    all_entries = []
-    counter = 0
-    while buckets_dup.length > counter
-      all_entries << [buckets_dup[counter], buckets_dup[counter + 1]]
-      counter += 2
-    end
-    all_entries
+    @buckets.flat_map { |bucket| bucket.map(&:itself)}
   end
+
+  private :grow, :shrink, :bucket_index
 end
